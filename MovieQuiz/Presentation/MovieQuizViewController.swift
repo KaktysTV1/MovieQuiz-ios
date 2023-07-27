@@ -105,6 +105,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.startAnimating() // включаем анимацию
     }
     
+    private func hideLoadingIndicator() {
+            activityIndicator.isHidden = true
+        }
+    
     // приватный метод, который меняет цвет рамки
     private func showAnswerResult(isCorrect: Bool) {
         if isCorrect {
@@ -170,7 +174,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func showNetworkError(message: String) {
-        //hideLoadingIndicator()
+        hideLoadingIndicator()
         
         let model = AlertModel(title: "Ошибка",
                                message: message,

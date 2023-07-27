@@ -55,10 +55,10 @@ class QuestionFactory: QuestionFactoryProtocol {
             let text: String
             let correctAnswer: Bool
             if Bool.random() {
-                text = "Рейтинг этого фильма меньше чем \(randomRatingValue)?"
+                text = "Рейтинг этого фильма меньше, чем \(randomRatingValue)?"
                 correctAnswer = rating < Float(randomRatingValue)
             } else {
-                text = "Рейтинг этого фильма больше чем \(randomRatingValue)?"
+                text = "Рейтинг этого фильма больше, чем \(randomRatingValue)?"
                 correctAnswer = rating > Float(randomRatingValue)
             }
             
