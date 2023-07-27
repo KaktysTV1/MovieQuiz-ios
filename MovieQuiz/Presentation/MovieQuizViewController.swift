@@ -45,7 +45,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         //обращение к фабрике вопросов
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        questionFactory?.requestNextQuestion()
+        questionFactory?.loadData()
         
         statisticService = StatisticServiceImplementation()
         
@@ -134,6 +134,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса
     private func show(quiz step: QuizStepViewModel) {
+      imageView.contentMode = .scaleAspectFill
       imageView.image = step.image
       textLabel.text = step.question
       counterLabel.text = step.questionNumber
