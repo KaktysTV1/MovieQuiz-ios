@@ -74,7 +74,6 @@ final class StatisticServiceImplementation: StatisticService {
         
         let currentGameRecord = GameRecord(correct: count, total: amount, date: Date())
         let lastGamesRecord = bestGame
-        var gamesCount = gamesCount
         if lastGamesRecord < currentGameRecord {
             bestGame = currentGameRecord
         }
