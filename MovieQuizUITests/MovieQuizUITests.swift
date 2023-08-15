@@ -27,26 +27,75 @@ final class MovieQuizUITests: XCTestCase {
         app = nil
     }
     
-    func testScreenCast() throws {
+    func testYesButton() throws {
+        sleep(3)
         
-        let app = XCUIApplication()
-        let button = app.buttons["Да"]
-        button.tap()
+        let firstPoster = app.images["Poster"]
+        let firstPosterData = firstPoster.screenshot().pngRepresentation
         
-        let button2 = app.buttons["Нет"]
-        button2.tap()
-        button.swipeUp()
-        button.swipeUp()
-        button2.tap()
+        app.buttons["Yes"].tap()
+        sleep(3)
         
-        let element = app.windows.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element
-        element.swipeRight()
-        app/*@START_MENU_TOKEN@*/.scrollViews/*[[".windows[\"SBSwitcherWindow:Main\"]",".otherElements[\"AppSwitcherContentView\"]",".otherElements[\"MovieQuiz\"].scrollViews",".otherElements[\"card:a.chuprynenko:sceneID:a.chuprynenko-default\"].scrollViews",".scrollViews"],[[[-1,4],[-1,3],[-1,2],[-1,1,2],[-1,0,1]],[[-1,4],[-1,3],[-1,2],[-1,1,2]],[[-1,4],[-1,3],[-1,2]]],[0]]@END_MENU_TOKEN@*/.otherElements.statusBars.children(matching: .other).element.children(matching: .other).element.tap()
-        element.swipeDown()
-        app.otherElements["ControlCenterView"].children(matching: .scrollView).element.swipeUp()
+        let secondPoster = app.images["Poster"]
+        let secondPosterData = secondPoster.screenshot().pngRepresentation
         
+        let indexLable = app.staticTexts["Index"]
+        
+        XCTAssertNotEqual(firstPosterData, secondPosterData)
+        XCTAssertEqual(indexLable.label, "2/10")
+    }
+    
+    func testNoButton() throws {
+        sleep(3)
+        
+        let firstPoster = app.images["Poster"]
+        let firstPosterData = firstPoster.screenshot().pngRepresentation
+        
+        app.buttons["No"].tap()
+        sleep(3)
+        
+        let secondPoster = app.images["Poster"]
+        let secondPosterData = secondPoster.screenshot().pngRepresentation
+        
+        let indexLable = app.staticTexts["Index"]
+        
+        XCTAssertNotEqual(firstPosterData, secondPosterData)
+        XCTAssertEqual(indexLable.label, "2/10")
+    }
+    
+    func testAlertPresent() throws {
+        sleep(3)
+        
+        for _ in 1...10 {
+            app.buttons["Yes"].tap()
+            sleep(3)
+        }
+        
+        let alert = app.alerts["Alert Result"]
+        
+        XCTAssertTrue(alert.exists)
+        XCTAssertTrue(alert.label == "Этот раунд окончен!")
+        XCTAssertTrue(alert.buttons.firstMatch.label == "Сыграть ещё раз")
     }
 
+    func testAlertDismiss() throws {
+        sleep(3)
+        for _ in 1...10 {
+            app.buttons["Yes"].tap()
+            sleep(3)
+        }
+        
+        let alert = app.alerts["Alert Result"]
+        alert.buttons.firstMatch.tap()
+        sleep(3)
+        
+        let indexLable = app.staticTexts["Index"]
+        
+        XCTAssertFalse(alert.exists)
+        XCTAssertTrue(indexLable.label == "1/10")
+        
+    }
+    
     func testExample() throws {
         
         let app = XCUIApplication()
