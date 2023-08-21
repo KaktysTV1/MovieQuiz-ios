@@ -16,7 +16,10 @@ final class MovieQuizPresenter {
     var correctAnswers: Int = 0
     private var questionFactory: QuestionFactoryProtocol?
     
-    private lazy var alertPresenter = AlertPresenter(viewController: UIViewController())
+    lazy var alertPresenter: AlertPresenter? = {
+        guard let viewController else { return nil }
+        return AlertPresenter(viewController: viewController)
+    }()
     
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     let questionsAmount: Int = 10
@@ -49,7 +52,7 @@ final class MovieQuizPresenter {
         }
         
         let givenAnswer = true
-            
+        
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
@@ -73,12 +76,12 @@ final class MovieQuizPresenter {
         }
         
         let givenAnswer = true
-            
+        
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
     func noButtonClicked() {
-       
+        
         //распаковка опционала для хранения текущего вопроса
         guard let currentQuestion = currentQuestion else {
             return
@@ -89,10 +92,39 @@ final class MovieQuizPresenter {
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    func showNextQuestionOrResults() {
-        if isLastQuestion() {
-            let totalQuestions = currentQuestionIndex + 1
-    
+    func showAnswerResult(isCorrect: Bool) {
+        if isCorrect {
+            correctAnswers += 1
+            
+            ///реализована корректная работа замыкания
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                guard let self = self else { return }
+                self.presenter.correctAnswers = self.correctAnswers
+                self.presenter.questionFactory = self.questionFactory
+                self.presenter.showNextQuestionOrResults()
+            }
+        }
+        
+        func showNetworkError(message: String) {
+            
+            let model = AlertModel(title: "Ошибка",
+                                   message: message,
+                                   buttonText: "Попробовать еще раз") { [weak self] _ in
+                guard let self = self else { return }
+                
+                self.resetQuestionIndex()
+                self.correctAnswers = 0
+                
+                self.questionFactory?.requestNextQuestion()
+            }
+            
+            alertPresenter?.showResultsAlert(model)
+        }
+        
+        func showNextQuestionOrResults() {
+            if isLastQuestion() {
+                let totalQuestions = currentQuestionIndex + 1
+                
                 statisticService.store(correct: correctAnswers, total: self.questionsAmount)
                 
                 let gamesCount = statisticService.gamesCount
@@ -107,20 +139,20 @@ final class MovieQuizPresenter {
                                 Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
                             """
                 
-            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
-                        
-            alertPresenter.showResultsAlert(alertModel)
-            
-        } else {
-            switchToNextQuestion()
-            questionFactory?.requestNextQuestion()
-            
+                let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
+                
+                alertPresenter?.showResultsAlert(alertModel)
+                
+            } else {
+                switchToNextQuestion()
+                questionFactory?.requestNextQuestion()
+                
+            }
+        }
+        
+        func startNewQuiz(_ : UIAlertAction){
+            self.correctAnswers = 0
+            self.currentQuestionIndex = 0
+            self.questionFactory?.requestNextQuestion()
         }
     }
-    
-    func startNewQuiz(_ : UIAlertAction){
-        self.correctAnswers = 0
-        self.currentQuestionIndex = 0
-        self.questionFactory?.requestNextQuestion()
-    }
-}
