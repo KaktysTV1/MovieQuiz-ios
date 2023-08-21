@@ -16,6 +16,8 @@ final class MovieQuizPresenter {
     var correctAnswers: Int = 0
     private var questionFactory: QuestionFactoryProtocol?
     
+    private lazy var alertPresenter = AlertPresenter(viewController: UIViewController())
+    
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
@@ -41,7 +43,7 @@ final class MovieQuizPresenter {
         )
     }
     
-    private func didAnswer(isYes: Bool) {
+    func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {
             return
         }
@@ -87,7 +89,7 @@ final class MovieQuizPresenter {
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
-    private func showNextQuestionOrResults() {
+    func showNextQuestionOrResults() {
         if isLastQuestion() {
             let totalQuestions = currentQuestionIndex + 1
     
@@ -107,7 +109,7 @@ final class MovieQuizPresenter {
                 
             let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
                         
-                viewController?.show(quiz: alertModel)
+            alertPresenter.showResultsAlert(alertModel)
             
         } else {
             switchToNextQuestion()
