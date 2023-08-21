@@ -19,6 +19,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //аутлет загрузки
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
+    
     //Добавляем презентер в вью контроллер
     private let presenter = MovieQuizPresenter()
     
@@ -34,6 +35,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private lazy var alertPsenenter = AlertPresenter(viewController: self)
     
     private var statisticService: StatisticService?
+    
     
     // MARK: - Lifecycle
     override func viewDidLoad() {

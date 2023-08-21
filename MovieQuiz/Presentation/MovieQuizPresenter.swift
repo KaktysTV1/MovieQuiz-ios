@@ -11,15 +11,15 @@ import UIKit
 final class MovieQuizPresenter {
     //текущий вопрос, который видит пользователь
     var currentQuestion: QuizQuestion?
-    var statisticService: StatisticService!
+    private let statisticService: StatisticService = StatisticServiceImplementation()
     weak var viewController: MovieQuizViewController?
-    private var questionFactory: QuestionFactoryProtocol?
-    
     var correctAnswers: Int = 0
+    private var questionFactory: QuestionFactoryProtocol?
     
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
+    
     
     func isLastQuestion() -> Bool {
         currentQuestionIndex == questionsAmount - 1
@@ -88,9 +88,9 @@ final class MovieQuizPresenter {
     }
     
     private func showNextQuestionOrResults() {
-        if self.isLastQuestion() {
-            if var statisticService = statisticService {
-                
+        if isLastQuestion() {
+            let totalQuestions = currentQuestionIndex + 1
+    
                 statisticService.store(correct: correctAnswers, total: self.questionsAmount)
                 
                 let gamesCount = statisticService.gamesCount
@@ -105,11 +105,12 @@ final class MovieQuizPresenter {
                                 Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
                             """
                 
-                let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
-                viewController?.show(quiz: viewModel)
-            }
+            let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
+                        
+                viewController?.show(quiz: alertModel)
+            
         } else {
-            self.switchToNextQuestion()
+            switchToNextQuestion()
             questionFactory?.requestNextQuestion()
             
         }

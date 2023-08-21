@@ -18,9 +18,7 @@ class AlertPresenter {
         
     func showResultsAlert(_ alertModel: AlertModel) {
             let alert = UIAlertController(title: alertModel.title, message: alertModel.message, preferredStyle: .alert)
-            let action = UIAlertAction(title: alertModel.buttonText, style: .default) {_ in
-                alertModel.completion()
-            }
+            let action = UIAlertAction(title: alertModel.buttonText, style: .default)
             
             guard let viewController = viewController else { return }
             alert.view.accessibilityIdentifier = "Alert Result"
