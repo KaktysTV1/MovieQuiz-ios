@@ -9,6 +9,14 @@ import Foundation
 import UIKit
 
 final class MovieQuizPresenter {
+    //текущий вопрос, который видит пользователь
+    var currentQuestion: QuizQuestion?
+    var statisticService: StatisticService!
+    weak var viewController: MovieQuizViewController?
+    private var questionFactory: QuestionFactoryProtocol?
+    
+    var correctAnswers: Int = 0
+    
     // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
@@ -31,5 +39,85 @@ final class MovieQuizPresenter {
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
+    }
+    
+    private func didAnswer(isYes: Bool) {
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = true
+            
+        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)}
+    }
+    
+    //событие кнопки да
+    func yesButtonClicked() {
+        
+        //распаковка опционала для хранения текущего вопроса
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = true
+            
+        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    func noButtonClicked() {
+       
+        //распаковка опционала для хранения текущего вопроса
+        guard let currentQuestion = currentQuestion else {
+            return
+        }
+        
+        let givenAnswer = false
+        
+        viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+    }
+    
+    private func showNextQuestionOrResults() {
+        if self.isLastQuestion() {
+            if var statisticService = statisticService {
+                
+                statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+                
+                let gamesCount = statisticService.gamesCount
+                let bestGame = statisticService.bestGame
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "dd.MM.YY HH:mm"
+                
+                let text = """
+                                Ваш результат: \(correctAnswers)\\\(self.questionsAmount)
+                                Количество сыгранных квизов: \(gamesCount)
+                                Ваш рекорд: \(bestGame.correct)/\(bestGame.total) (\(dateFormatter.string(from: bestGame.date)))
+                                Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
+                            """
+                
+                let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
+                viewController?.show(quiz: viewModel)
+            }
+        } else {
+            self.switchToNextQuestion()
+            questionFactory?.requestNextQuestion()
+            
+        }
+    }
+    
+    func startNewQuiz(_ : UIAlertAction){
+        self.correctAnswers = 0
+        self.currentQuestionIndex = 0
+        self.questionFactory?.requestNextQuestion()
     }
 }

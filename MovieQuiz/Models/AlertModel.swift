@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 //публичная модель алерат
 public struct AlertModel {
     let title: String
     let message: String
     let buttonText: String
-    let completion: () -> Void
+    let completion: (UIAlertAction) -> Void
 }
