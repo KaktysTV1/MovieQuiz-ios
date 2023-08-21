@@ -92,6 +92,21 @@ final class MovieQuizPresenter {
         viewController?.showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
     
+    func show(quiz result: QuizResultsViewModel) {
+        let completion = {
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.questionFactory?.requestNextQuestion()
+        }
+        let alertModel = AlertModel(
+            title: result.title,
+            message: result.text,
+            buttonText: result.buttonText,
+            completion: completion)
+        
+        alertPresenter?.showResultsAlert(alertModel)
+    }
+    
     func showAnswerResult(isCorrect: Bool) {
         if isCorrect {
             correctAnswers += 1
@@ -99,9 +114,9 @@ final class MovieQuizPresenter {
             ///реализована корректная работа замыкания
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 guard let self = self else { return }
-                self.presenter.correctAnswers = self.correctAnswers
-                self.presenter.questionFactory = self.questionFactory
-                self.presenter.showNextQuestionOrResults()
+                self.correctAnswers = self.correctAnswers
+                self.questionFactory = self.questionFactory
+                self.showNextQuestionOrResults()
             }
         }
         
@@ -156,3 +171,4 @@ final class MovieQuizPresenter {
             self.questionFactory?.requestNextQuestion()
         }
     }
+}
