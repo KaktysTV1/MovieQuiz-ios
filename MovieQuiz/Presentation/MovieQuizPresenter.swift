@@ -128,15 +128,14 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func showAnswerResult(isCorrect: Bool) {
             if isCorrect {
-                switchToNextQuestion()
-                
                 ///реализована корректная работа замыкания
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     guard let self = self else { return }
                     self.correctAnswers = self.correctAnswers
                     self.questionFactory = self.questionFactory
-                    self.viewController?.showNextQuestionOrResults()
+                    showNextQuestionOrResults()
                 }
+                switchToNextQuestion()
             }
         
         func showNetworkError(message: String) {
@@ -155,9 +154,8 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             alertPresenter?.showResultsAlert(model)
         }
         
-        func showNextQuestionOrResults() {
-                    if isLastQuestion() {
-                        let totalQuestions = currentQuestionIndex + 1
+      func showNextQuestionOrResults() {
+          if self.isLastQuestion() {
                         
                         statisticService.store(correct: correctAnswers, total: self.questionsAmount)
                         
@@ -180,7 +178,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                     } else {
                         switchToNextQuestion()
                         questionFactory?.requestNextQuestion()
-                        
                     }
                 }
         
