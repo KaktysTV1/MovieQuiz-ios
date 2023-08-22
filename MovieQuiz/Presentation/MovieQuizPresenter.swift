@@ -8,22 +8,40 @@
 import Foundation
 import UIKit
 
-final class MovieQuizPresenter {
+final class MovieQuizPresenter: QuestionFactoryDelegate {
+    func didLoadDataFromServer() {
+        viewController?.hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        let message = error.localizedDescription
+        viewController?.showNetworkError(message: message)
+    }
+    
     //текущий вопрос, который видит пользователь
     var currentQuestion: QuizQuestion?
-    private let statisticService: StatisticService = StatisticServiceImplementation()
+    private var statisticService: StatisticService = StatisticServiceImplementation()
     weak var viewController: MovieQuizViewController?
-    var correctAnswers: Int = 0
     private var questionFactory: QuestionFactoryProtocol?
     
     lazy var alertPresenter: AlertPresenter? = {
         guard let viewController else { return nil }
         return AlertPresenter(viewController: viewController)
     }()
-    
-    // приватный метод конвертации, который принимает моковый вопрос и возвращает вью модель для главного экрана
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
+    var correctAnswers: Int = 0
+    
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+        
+        statisticService = StatisticServiceImplementation()
+        
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+                questionFactory?.loadData()
+                viewController.showLoadingIndicator()
+    }
     
     
     func isLastQuestion() -> Bool {
@@ -39,7 +57,7 @@ final class MovieQuizPresenter {
     }
     
     func convert(model: QuizQuestion) -> QuizStepViewModel {
-        return QuizStepViewModel(
+        QuizStepViewModel(
             image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
@@ -65,6 +83,7 @@ final class MovieQuizPresenter {
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.viewController?.show(quiz: viewModel)}
+        
     }
     
     //событие кнопки да
@@ -109,7 +128,7 @@ final class MovieQuizPresenter {
     
     func showAnswerResult(isCorrect: Bool) {
             if isCorrect {
-                correctAnswers += 1
+                switchToNextQuestion()
                 
                 ///реализована корректная работа замыкания
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in

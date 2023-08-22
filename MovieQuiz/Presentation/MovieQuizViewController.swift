@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
     //аутлет кнопки да
     @IBOutlet weak var yesButton: UIButton!
     
@@ -21,11 +21,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     
     //Добавляем презентер в вью контроллер
-    private let presenter = MovieQuizPresenter()
-    
-    // переменная со счётчиком правильных ответов, начальное значение закономерно 0
-    
-    
+    private var presenter: MovieQuizPresenter!
+  
     //обращение к протоколу фабрики вопросов
     private var questionFactory: QuestionFactoryProtocol?
     
@@ -41,9 +38,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         showLoadingIndicator()
         
         //обращение к фабрике вопросов
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
-        questionFactory?.loadData()
-        presenter.viewController = self
+        presenter = MovieQuizPresenter(viewController: self)
         
         statisticService = StatisticServiceImplementation()
         
@@ -54,14 +49,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     //событие кнопки да
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         presenter.yesButtonClicked()
-        
-        
     }
     
     //событие кнопки нет
     @IBAction private func noButtonClicked(_ sender: UIButton) {
         presenter.noButtonClicked()
     }
+    
     
     func didFailToLoadData(with error: Error) {
         showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
@@ -78,12 +72,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         presenter.didReceiveNextQuestion(question: question)
     }
     
-    private func showLoadingIndicator() {
+    func showLoadingIndicator() {
         activityIndicator.isHidden = false // говорим, что индикатор загрузки не скрыт
         activityIndicator.startAnimating() // включаем анимацию
     }
     
-    private func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
         activityIndicator.isHidden = true
     }
     
