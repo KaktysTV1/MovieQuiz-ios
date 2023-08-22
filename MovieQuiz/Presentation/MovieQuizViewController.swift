@@ -89,37 +89,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод, который меняет цвет рамки
     func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                guard let self = self else { return }
-                self.presenter.correctAnswers = self.correctAnswers
-                self.presenter.questionFactory = self.questionFactory
-                self.presenter.showNextQuestionOrResults()
-            }
+            imageView.layer.masksToBounds = true
+            imageView.layer.borderWidth = 8
+            imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+            imageView.layer.cornerRadius = 20
+            
+            //отключает активность кнопок после нажатия на ответ
+            self.yesButton.isEnabled = false
+            self.noButton.isEnabled = false
+            
+        self.presenter.showAnswerResult(isCorrect: true)
         }
-        
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        imageView.layer.cornerRadius = 20
-        
-        //отключает активность кнопок после нажатия на ответ
-        self.yesButton.isEnabled = false
-        self.noButton.isEnabled = false
-        
-        ///реализована корректная работа замыкания
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            self?.showNextQuestionOrResults()
-            
-            self?.imageView.layer.borderWidth = 0
-            
-            //включает активность кнопок после показа следующего вопроса
-            self?.yesButton.isEnabled = true
-            self?.noButton.isEnabled = true
-        }
-    }
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса
     func show(quiz step: QuizStepViewModel) {
@@ -131,19 +112,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     func show(quiz result: QuizResultsViewModel) {
-        let completion = {
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            self.questionFactory?.requestNextQuestion()
+        self.presenter.alertPresenter
         }
-        let alertModel = AlertModel(
-            title: result.title,
-            message: result.text,
-            buttonText: result.buttonText,
-            completion: completion)
-        
-        alertPsenenter.showResultsAlert(alertModel)
-    }
     
     
     
@@ -152,13 +122,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         .lightContent
     }
     
-    private func showNetworkError(message: String) {
+    func showNetworkError(message: String) {
         hideLoadingIndicator()
         self.presenter.viewController?.showNetworkError(message: String())
     }
     
     // приватный метод, который содержит логику перехода в один из сценариев
     func showNextQuestionOrResults() {
-        self.presenter.viewController?.showNextQuestionOrResults()
-    }
+           self.presenter.viewController?.showNextQuestionOrResults()
+       }
 }

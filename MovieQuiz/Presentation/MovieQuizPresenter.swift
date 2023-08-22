@@ -93,32 +93,32 @@ final class MovieQuizPresenter {
     }
     
     func show(quiz result: QuizResultsViewModel) {
-        let completion = {
-            self.currentQuestionIndex = 0
-            self.correctAnswers = 0
-            self.questionFactory?.requestNextQuestion()
-        }
-        let alertModel = AlertModel(
-            title: result.title,
-            message: result.text,
-            buttonText: result.buttonText,
-            completion: completion)
-        
-        alertPresenter?.showResultsAlert(alertModel)
-    }
+        let completion = { (_: UIAlertAction) -> Void in
+               self.currentQuestionIndex = 0
+               self.correctAnswers = 0
+               self.questionFactory?.requestNextQuestion()
+           }
+           let alertModel = AlertModel(
+               title: result.title,
+               message: result.text,
+               buttonText: result.buttonText,
+               completion: completion)
+           
+           alertPresenter?.showResultsAlert(alertModel)
+       }
     
     func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-            
-            ///реализована корректная работа замыкания
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                guard let self = self else { return }
-                self.correctAnswers = self.correctAnswers
-                self.questionFactory = self.questionFactory
-                self.showNextQuestionOrResults()
+            if isCorrect {
+                correctAnswers += 1
+                
+                ///реализована корректная работа замыкания
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                    guard let self = self else { return }
+                    self.correctAnswers = self.correctAnswers
+                    self.questionFactory = self.questionFactory
+                    self.viewController?.showNextQuestionOrResults()
+                }
             }
-        }
         
         func showNetworkError(message: String) {
             
@@ -137,33 +137,33 @@ final class MovieQuizPresenter {
         }
         
         func showNextQuestionOrResults() {
-            if isLastQuestion() {
-                let totalQuestions = currentQuestionIndex + 1
-                
-                statisticService.store(correct: correctAnswers, total: self.questionsAmount)
-                
-                let gamesCount = statisticService.gamesCount
-                let bestGame = statisticService.bestGame
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "dd.MM.YY HH:mm"
-                
-                let text = """
-                                Ваш результат: \(correctAnswers)\\\(self.questionsAmount)
-                                Количество сыгранных квизов: \(gamesCount)
-                                Ваш рекорд: \(bestGame.correct)/\(bestGame.total) (\(dateFormatter.string(from: bestGame.date)))
-                                Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
-                            """
-                
-                let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
-                
-                alertPresenter?.showResultsAlert(alertModel)
-                
-            } else {
-                switchToNextQuestion()
-                questionFactory?.requestNextQuestion()
-                
-            }
-        }
+                    if isLastQuestion() {
+                        let totalQuestions = currentQuestionIndex + 1
+                        
+                        statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+                        
+                        let gamesCount = statisticService.gamesCount
+                        let bestGame = statisticService.bestGame
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "dd.MM.YY HH:mm"
+                        
+                        let text = """
+                                        Ваш результат: \(correctAnswers)\\\(self.questionsAmount)
+                                        Количество сыгранных квизов: \(gamesCount)
+                                        Ваш рекорд: \(bestGame.correct)/\(bestGame.total) (\(dateFormatter.string(from: bestGame.date)))
+                                        Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
+                                    """
+                        
+                        let alertModel = AlertModel(title: "Этот раунд окончен!", message: text, buttonText: "Сыграть ещё раз", completion: startNewQuiz)
+                        
+                        alertPresenter?.showResultsAlert(alertModel)
+                        
+                    } else {
+                        switchToNextQuestion()
+                        questionFactory?.requestNextQuestion()
+                        
+                    }
+                }
         
         func startNewQuiz(_ : UIAlertAction){
             self.correctAnswers = 0
