@@ -1,6 +1,6 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
     //аутлет кнопки да
     @IBOutlet weak var yesButton: UIButton!
     
@@ -112,9 +112,7 @@ final class MovieQuizViewController: UIViewController {
     func show(quiz result: QuizResultsViewModel) {
         self.presenter.show(quiz: result)
         }
-    
-    
-    
+
     //изменяет статус бар на белый
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
