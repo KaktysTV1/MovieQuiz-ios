@@ -34,25 +34,24 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     //текущий вопрос, который видит пользователь
     var currentQuestion: QuizQuestion?
     private var statisticService: StatisticService = StatisticServiceImplementation()
-    weak var viewController: MovieQuizViewController?
+    weak var viewController: MovieQuizViewControllerProtocol?
     private var questionFactory: QuestionFactoryProtocol?
     
-    lazy var alertPresenter: AlertPresenter? = {
-        guard let viewController else { return nil }
-        return AlertPresenter(viewController: viewController)
-    }()
+    
+    lazy var alertPresenter: AlertPresenter? = AlertPresenter(viewController: viewController as! UIViewController)
+    
     let questionsAmount: Int = 10
     private var currentQuestionIndex: Int = 0
     var correctAnswers: Int = 0
     
-    init(viewController: MovieQuizViewController) {
-        self.viewController = viewController
+    init(viewControllerProtocol: MovieQuizViewController) {
+        self.viewController = viewControllerProtocol
         
         statisticService = StatisticServiceImplementation()
         
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
                 questionFactory?.loadData()
-                viewController.showLoadingIndicator()
+        viewController?.showLoadingIndicator()
     }
     
     
