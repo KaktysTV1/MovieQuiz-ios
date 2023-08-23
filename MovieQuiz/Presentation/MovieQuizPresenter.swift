@@ -127,17 +127,16 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
        }
     
     func showAnswerResult(isCorrect: Bool) {
-            if isCorrect {
-                ///реализована корректная работа замыкания
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                    guard let self = self else { return }
-                    self.correctAnswers = self.correctAnswers
-                    self.questionFactory = self.questionFactory
-                    showNextQuestionOrResults()
-                }
-                switchToNextQuestion()
+        if isCorrect {
+            ///реализована корректная работа замыкания
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                guard let self = self else { return }
+                self.correctAnswers = self.correctAnswers
+                self.questionFactory = self.questionFactory
+                showNextQuestionOrResults()
             }
-        
+        }
+    }
         func showNetworkError(message: String) {
             
             let model = AlertModel(title: "Ошибка",
@@ -186,5 +185,4 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self.currentQuestionIndex = 0
             self.questionFactory?.requestNextQuestion()
         }
-    }
 }

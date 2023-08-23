@@ -94,6 +94,9 @@ final class MovieQuizViewController: UIViewController {
             self.noButton.isEnabled = false
             
         self.presenter.showAnswerResult(isCorrect: true)
+        
+        self.yesButton.isEnabled = true
+        self.noButton.isEnabled = true
         }
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса
@@ -102,6 +105,7 @@ final class MovieQuizViewController: UIViewController {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
+        imageView.layer.borderWidth = 0
         
     }
     
@@ -118,11 +122,11 @@ final class MovieQuizViewController: UIViewController {
     
     func showNetworkError(message: String) {
         hideLoadingIndicator()
-        self.presenter.viewController?.showNetworkError(message: String())
+        self.presenter.showNetworkError(message: String())
     }
     
     // приватный метод, который содержит логику перехода в один из сценариев
     func showNextQuestionOrResults() {
-           self.presenter.viewController?.showNextQuestionOrResults()
+           self.presenter.showNextQuestionOrResults()
        }
 }
