@@ -165,9 +165,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
         
       func showNextQuestionOrResults() {
-          if self.isLastQuestion() {
+          if isLastQuestion() {
                         
-              statisticService.store(correct: self.correctAnswers, total: self.questionsAmount)
+              let questionsAmount = currentQuestionIndex + 1
+              statisticService.store(correct: correctAnswers, total: questionsAmount)
                         
                         let gamesCount = statisticService.gamesCount
                         let bestGame = statisticService.bestGame
@@ -175,7 +176,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
                         dateFormatter.dateFormat = "dd.MM.YY HH:mm"
                         
                         let text = """
-                                        Ваш результат: \(correctAnswers)\\\(self.questionsAmount)
+                                        Ваш результат: \(correctAnswers) из \(questionsAmount)
                                         Количество сыгранных квизов: \(gamesCount)
                                         Ваш рекорд: \(bestGame.correct)/\(bestGame.total) (\(dateFormatter.string(from: bestGame.date)))
                                         Средняя точность: (\(String(format: "%.2f", statisticService.totalAccuracy))%)
