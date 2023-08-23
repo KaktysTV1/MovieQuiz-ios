@@ -156,7 +156,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
       func showNextQuestionOrResults() {
           if self.isLastQuestion() {
                         
-                        statisticService.store(correct: correctAnswers, total: self.questionsAmount)
+              statisticService.store(correct: self.correctAnswers, total: self.questionsAmount)
                         
                         let gamesCount = statisticService.gamesCount
                         let bestGame = statisticService.bestGame

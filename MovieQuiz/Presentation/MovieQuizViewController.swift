@@ -110,7 +110,7 @@ final class MovieQuizViewController: UIViewController {
     }
     
     func show(quiz result: QuizResultsViewModel) {
-        self.presenter.alertPresenter
+        self.presenter.show(quiz: result)
         }
     
     
