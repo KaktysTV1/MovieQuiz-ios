@@ -90,13 +90,10 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             imageView.layer.cornerRadius = 20
             
             //отключает активность кнопок после нажатия на ответ
-            self.yesButton.isEnabled = false
-            self.noButton.isEnabled = false
+            yesButton.isEnabled = false
+            noButton.isEnabled = false
             
-        self.presenter.showAnswerResult(isCorrect: true)
-        
-        self.yesButton.isEnabled = true
-        self.noButton.isEnabled = true
+        self.presenter.showAnswerResult(isCorrect: isCorrect)
         }
     
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса
@@ -107,6 +104,8 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         counterLabel.text = step.questionNumber
         imageView.layer.borderWidth = 0
         
+        self.yesButton.isEnabled = true
+        self.noButton.isEnabled = true
     }
     
     func show(quiz result: QuizResultsViewModel) {

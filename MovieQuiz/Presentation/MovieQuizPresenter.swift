@@ -139,13 +139,13 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func showAnswerResult(isCorrect: Bool) {
         if isCorrect {
-            ///реализована корректная работа замыкания
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                guard let self = self else { return }
-                self.correctAnswers = self.correctAnswers
-                self.questionFactory = self.questionFactory
-                showNextQuestionOrResults()
+            correctAnswers += 1
             }
+        ///реализована корректная работа замыкания
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            showNextQuestionOrResults()
+
         }
     }
         func showNetworkError(message: String) {
