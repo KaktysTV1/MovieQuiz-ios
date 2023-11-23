@@ -64,7 +64,7 @@ final class StatisticServiceImplementation: StatisticService {
     
     var totalAccuracy : Double {
         get {
-            return Double(totalScore) / Double(gamesCount) * magicNumber
+            Double(totalScore) / Double(gamesCount) * magicNumber
         }
     }
     
